@@ -25,58 +25,53 @@
          data-logo_alignment="left">
       </div>
 
+      <a href="#" id="signOut">Sign In - Enlace</a>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <a href="#" onclick="signOut();">Sign Out - Enlace</a>
-    
     <script>
 
-        console.log(window.location.hostname.includes('localhost'));
+      console.log(window.location.hostname.includes('localhost'))
 
-        var url = ( window.location.hostname.includes('localhost'))
-        ? 'http://localhost:8080/api/auth/google'
-        : 'https://restserver-nodeee.herokuapp.com/api/auth/google'
-
-
-        function onSignIn(googleUser) {
-
-         var profile = googleUser.getBasicProfile();
-         
-           console.log('ID: ' + profile.getId());
-           console.log('Name: ' + profile.getName());
-           console.log('Image URL: ' + profile.getImageUrl());
-           console.log('Email: ' + profile.getEmail());
-
-           var id_token = googleUser.getAuthResponse().id_token;
-           const data = { id_token };
-
-           fetch( url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify( data )
-           })
-           .then( resp => resp.json() )
-           .then( resp => {
-            console.log( resp )
-            localStorage.setItem( 'email', resp.usuario.correo )
-            })
-         .then( data => console.log('Nuestro Server', data ))          
-         .catch( console.warn );
-     
-       }
+      var url = ( window.location.hostname.includes('localhost') )
+          ? 'http://localhost:8080/api/auth/google'
+          : 'https://restserver-nodeee.herokuapp.com/'
 
 
-     function signOut() {
+  function onSignIn( response ) {
 
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
+const data = { id_token: response.credential }
 
-         console.log('User Signed Out');
-      });
-     }
-     
-     </script>
+  fetch( url, {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json'},
+   body: JSON.stringify( data )
+  })
+  .then( resp => resp.json() )
+  .then( resp => {
+   console.log( resp )
+   localStorage.setItem( 'email', resp.usuario.correo )
+   })         
+.catch( console.warn );
+
+}
+
+
+     const button = document.getElementById('signOut');
+        button.onclick = () => {
+
+         console.log( google.accounts.id );
+         google.accounts.id.disableAutoSelect()
+
+         google.accounts.id.revoke( localStorage.getItem( 'email' ), done => {
+            localStorage.clear();
+            location.reload();
+         });
+        }
+
+
+
+      </script>
 
      
 </body>
