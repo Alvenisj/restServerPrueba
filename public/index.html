@@ -14,7 +14,7 @@
     <div id="g_id_onload"
          data-client_id="873515594290-72h729f1b9mn6qasm6nuo8moco31qu3s.apps.googleusercontent.com"
          data-auto_prompt="false"
-         data-callback="onSignIn">
+         data-callback="handleCredentialResponse">
       </div>
       <div class="g_id_signin"
          data-type="standard"
@@ -38,24 +38,26 @@
           : 'https://restserver-nodeee.herokuapp.com'
 
 
-  function onSignIn( response ) {
+          function handleCredentialResponse(response) {    
+          // Google Token : ID_TOKEN
+         // console.log('ID_Token:', response.credential)
+         const body = { id_token: response.credential }
 
-const data = { id_token: response.credential }
+         fetch('http://localhost:8080/api/auth/google', {
+            method: 'POST',
+            headers:  {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( body )
+         })
+         .then( resp => resp.json() )
+         .then( resp => {
+          console.log( resp )
+          localStorage.setItem( 'email', resp.usuario.correo )
+         })
 
-  fetch( url, {
-   method: 'POST',
-   headers: { 'Content-Type': 'application/json'},
-   body: JSON.stringify( data )
-  })
-  .then( resp => resp.json() )
-  .then( resp => {
-   console.log( resp )
-   localStorage.setItem( 'email', resp.usuario.correo )
-   })         
-.catch( console.log );
-
-}
-
+         .catch( console.warn );
+      }
 
      const button = document.getElementById('signOut');
         button.onclick = () => {
